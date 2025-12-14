@@ -1,6 +1,6 @@
 export const config = {
   openai: {
-    model: "o-4-mini",
+    model: "gpt-4o-mini",
     temperature: 0.6
   },
   server: {
