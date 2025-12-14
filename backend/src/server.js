@@ -7,18 +7,19 @@ const app = express();
 
 /**
  * LEIDŽIAMI ORIGINAI
- * pridėk čia visus Framer variantus
+ * Framer naudoja dinaminius subdomenus – todėl regex
  */
 const allowedOrigins = [
   "https://aidra.framer.ai",
   "https://framer.com",
+  /\.framer\.ai$/,
   /\.framercanvas\.com$/,
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // leidžiam server-side / curl / postman
+    origin: (origin, callback) => {
+      // leidžiam server-side (Render healthcheck, curl, Postman)
       if (!origin) return callback(null, true);
 
       const isAllowed = allowedOrigins.some((o) =>
@@ -28,6 +29,7 @@ app.use(
       if (isAllowed) {
         callback(null, true);
       } else {
+        console.error("❌ CORS blocked:", origin);
         callback(new Error("CORS not allowed"));
       }
     },
@@ -42,5 +44,5 @@ app.use("/api/chat", chatRoute);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+  console.log(`🚀 Backend running on http://localhost:${PORT}`);
 });
