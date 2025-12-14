@@ -1,0 +1,15 @@
+{
+  "company": "AidraAI",
+  "plans": {
+    "basic": {
+      "name": "Basic AI botas",
+      "price": "€149",
+      "description": "Automatiniai atsakymai į dažniausius klausimus"
+    },
+    "premium": {
+      "name": "Premium AI asistentas su GPT",
+      "price": "€299",
+      "description": "Gyvas AI, padedantis pasirinkti sprendimus ir produktus"
+    }
+  }
+}

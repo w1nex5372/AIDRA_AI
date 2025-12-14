@@ -1,0 +1,28 @@
+{
+  "name": "Demo E-shop",
+  "type": "ecommerce",
+  "currency": "EUR",
+
+  "products": [
+    {
+      "name": "Premium ausinės",
+      "price": 149,
+      "best_for": ["darbas", "muzika"]
+    },
+    {
+      "name": "Sportinės ausinės",
+      "price": 89,
+      "best_for": ["sportas"]
+    }
+  ],
+
+  "goals": [
+    "padėti išsirinkti produktą",
+    "padidinti konversiją"
+  ],
+
+  "cta": {
+    "primary": "Pridėti į krepšelį",
+    "secondary": "Susisiekti"
+  }
+}
