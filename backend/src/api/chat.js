@@ -22,7 +22,8 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "No message provided" });
     }
 
-    const systemPrompt = loadPrompt("premium_aidra.txt");
+    const systemPrompt = loadPrompt("premium_aidra");
+
 
     const reply = await askGPT(
       systemPrompt,
