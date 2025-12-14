@@ -6,27 +6,26 @@ import chatRoute from "./api/chat.js";
 const app = express();
 
 /**
- * LEIDŽIAMI ORIGINAI
- * Framer naudoja dinaminius subdomenus – todėl regex
+ * LEIDŽIAMI ORIGINAI (TEISINGAI)
  */
 const allowedOrigins = [
-  "https://aidra.framer.ai",
-  "https://framer.com",
-  /\.framer\.ai$/,
-  /\.framercanvas\.com$/,
+  /^https:\/\/.*\.framer\.ai$/,
+  /^https:\/\/.*\.framercanvas\.com$/,
+  /^https:\/\/framer\.com$/,
+  /^https:\/\/.*\.onrender\.com$/, // jei testuosi iš kitur
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // leidžiam server-side (Render healthcheck, curl, Postman)
+      // leidžiam server-side, curl, postman
       if (!origin) return callback(null, true);
 
-      const isAllowed = allowedOrigins.some((o) =>
-        o instanceof RegExp ? o.test(origin) : o === origin
+      const allowed = allowedOrigins.some((regex) =>
+        regex.test(origin)
       );
 
-      if (isAllowed) {
+      if (allowed) {
         callback(null, true);
       } else {
         console.error("❌ CORS blocked:", origin);
@@ -39,10 +38,9 @@ app.use(
 );
 
 app.use(express.json());
-
 app.use("/api/chat", chatRoute);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running on http://localhost:${PORT}`);
+  console.log(`✅ Backend running on ${PORT}`);
 });
