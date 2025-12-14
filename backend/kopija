@@ -1,0 +1,256 @@
+<div style="
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  font-family: Inter, system-ui, sans-serif;
+">
+
+  <div style="
+    border-radius:28px;
+    padding:18px;
+    background:
+      radial-gradient(circle at top left, rgba(139,92,246,0.45), rgba(8,8,16,0.96));
+    box-shadow:
+      0 0 0 1px rgba(168,85,247,0.35),
+      0 30px 80px rgba(139,92,246,0.55);
+    backdrop-filter: blur(24px);
+    color:#fff;
+  ">
+
+    <!-- HEADER -->
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 14px;
+      border-radius:18px;
+      background:linear-gradient(135deg,#8b5cf6,#6d28d9);
+      box-shadow:0 12px 30px rgba(139,92,246,.7);
+      font-weight:600;
+      font-size:14px;
+    ">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="
+          width:16px;height:16px;border-radius:50%;
+          background:radial-gradient(circle at 30% 30%,#fff,#f59e0b);
+        "></span>
+        AI sprendimų asistentas
+      </div>
+      <span style="
+        font-size:11px;
+        padding:4px 10px;
+        border-radius:999px;
+        background:rgba(0,0,0,.35);
+        border:1px solid rgba(255,255,255,.25);
+      ">
+        GPT-5.2
+      </span>
+    </div>
+
+    <!-- SUBTITLE -->
+    <div style="
+      margin-top:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      background:rgba(0,0,0,.45);
+      font-size:13px;
+      color:#e5e7eb;
+    ">
+      AI, kuris ne tik atsako – jis veda klientą iki sprendimo.
+    </div>
+
+    <!-- CHAT -->
+    <div id="pChat" style="
+      margin-top:14px;
+      height:360px;
+      overflow-y:auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      padding-right:4px;
+    ">
+      <div style="display:flex;gap:8px;">
+        <div style="font-size:18px;">🤖</div>
+        <div style="
+          background:rgba(0,0,0,.6);
+          border:1px solid rgba(168,85,247,.45);
+          padding:12px 14px;
+          border-radius:16px;
+          font-size:13px;
+          line-height:1.45;
+          max-width:80%;
+        ">
+          Sveiki 👋<br><br>
+          Aš esu <b>Premium AI asistentas</b>, veikiantis su GPT-5.2.<br><br>
+          Galiu:
+          <ul style="margin:6px 0 0 18px;padding:0;">
+            <li>suprasti jūsų poreikį</li>
+            <li>pasiūlyti optimalų sprendimą</li>
+            <li>nukreipti iki veiksmo ar užsakymo</li>
+          </ul>
+          <br>Nuo ko pradedam?
+        </div>
+      </div>
+    </div>
+
+    <!-- SUGGESTIONS (BASIC STYLE) -->
+    <div id="pSuggestions" style="
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    ">
+      <button onclick="pUse('Noriu kainos pasiūlymo')" class="pill">💰 Kainos pasiūlymas</button>
+      <button onclick="pUse('Noriu užsiregistruoti')" class="pill">📅 Registracija</button>
+      <button onclick="pUse('Noriu pasikalbėti su konsultantu')" class="pill">👤 Konsultacija</button>
+    </div>
+
+    <!-- INPUT -->
+    <div style="
+      margin-top:14px;
+      display:flex;
+      gap:8px;
+      border-top:1px solid rgba(255,255,255,.12);
+      padding-top:12px;
+    ">
+      <input id="pInput" placeholder="Įrašykite savo tikslą..." style="
+        flex:1;
+        padding:10px 14px;
+        border-radius:999px;
+        border:1px solid rgba(148,163,184,.6);
+        background:rgba(15,23,42,.85);
+        color:#fff;
+        font-size:13px;
+        outline:none;
+      ">
+      <button onclick="pSend()" style="
+        padding:10px 18px;
+        border-radius:999px;
+        border:none;
+        background:linear-gradient(135deg,#8b5cf6,#6d28d9);
+        color:#fff;
+        font-weight:600;
+        cursor:pointer;
+        box-shadow:0 10px 26px rgba(139,92,246,.8);
+      ">
+        Siųsti
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.pill{
+  padding:6px 12px;
+  font-size:12px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.5);
+  background:rgba(15,23,42,.7);
+  color:#e5e7eb;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  transition:.15s ease;
+}
+.pill:hover{
+  background:rgba(30,64,175,.9);
+  box-shadow:0 8px 18px rgba(30,64,175,.6);
+  transform:translateY(-1px);
+}
+</style>
+
+
+<script>
+async function pSend(){
+  const input = document.getElementById("pInput");
+  const text = input.value.trim();
+  if(!text) return;
+
+  const chat = document.getElementById("pChat");
+
+  // USER MSG
+  chat.innerHTML += `
+    <div style="display:flex;justify-content:flex-end;">
+      <div style="
+        background:linear-gradient(135deg,#8b5cf6,#6d28d9);
+        padding:10px 14px;
+        border-radius:16px;
+        font-size:13px;
+        max-width:75%;
+        box-shadow:0 10px 26px rgba(139,92,246,.8);
+      ">${text}</div>
+    </div>
+  `;
+  input.value = "";
+  chat.scrollTop = chat.scrollHeight;
+
+  // TYPING
+  chat.innerHTML += `
+    <div id="typing" style="display:flex;gap:8px;">
+      <div style="font-size:18px;">🤖</div>
+      <div style="
+        background:rgba(0,0,0,.6);
+        border:1px solid rgba(168,85,247,.45);
+        padding:10px 14px;
+        border-radius:16px;
+        font-size:13px;
+      ">Rašo...</div>
+    </div>
+  `;
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    const res = await fetch("https://aidra-ai.onrender.com/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    if(!res.ok) throw new Error("API error");
+
+    const data = await res.json();
+    document.getElementById("typing").remove();
+
+    chat.innerHTML += `
+      <div style="display:flex;gap:8px;">
+        <div style="font-size:18px;">🤖</div>
+        <div style="
+          background:rgba(0,0,0,.6);
+          border:1px solid rgba(168,85,247,.45);
+          padding:12px 14px;
+          border-radius:16px;
+          font-size:13px;
+          max-width:80%;
+        ">${data.reply}</div>
+      </div>
+    `;
+    chat.scrollTop = chat.scrollHeight;
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById("typing")?.remove();
+    chat.innerHTML += `
+      <div style="display:flex;gap:8px;">
+        <div style="font-size:18px;">🤖</div>
+        <div style="
+          background:#3b0d1d;
+          border:1px solid #ef4444;
+          padding:10px 14px;
+          border-radius:16px;
+          font-size:13px;
+        ">
+          Įvyko klaida. Bandykite dar kartą.
+        </div>
+      </div>
+    `;
+  }
+}
+
+function pUse(text){
+  document.getElementById("pInput").value = text;
+  pSend();
+}
+</script>
+
