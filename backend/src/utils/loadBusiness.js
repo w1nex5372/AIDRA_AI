@@ -9,5 +9,9 @@ export function loadBusiness(slug) {
     `${slug}.json`
   );
 
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Business not found: ${slug}`);
+  }
+
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }

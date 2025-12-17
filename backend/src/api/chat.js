@@ -1,37 +1,40 @@
 import express from "express";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
 import { askGPT } from "../services/openai.js";
 import { loadPrompt } from "../utils/loadPrompt.js";
+import { loadBusiness } from "../utils/loadBusiness.js";
+import { loadClientConfig } from "../utils/loadClientConfig.js";
 
 const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const businessPath = path.join(__dirname, "../businesses/aidra.json");
-const business = fs.readFileSync(businessPath, "utf-8");
-
 router.post("/", async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, clientId } = req.body;
 
-    if (!message) {
-      return res.status(400).json({ error: "No message provided" });
+    if (!message || !clientId) {
+      return res.status(400).json({ error: "Missing message or clientId" });
     }
 
-    const systemPrompt = loadPrompt("premium_aidra");
+    // 1️⃣ Client config (viena tiesa)
+    const client = loadClientConfig(clientId);
+    if (!client) {
+      return res.status(404).json({ error: "Unknown clientId" });
+    }
 
+    // 2️⃣ Prompt pagal planą / versiją
+    const systemPrompt = loadPrompt(client.prompt);
 
+    // 3️⃣ Business kontekstas
+    const business = loadBusiness(client.business);
+
+    // 4️⃣ GPT
     const reply = await askGPT(
       systemPrompt,
-      business,
+      JSON.stringify(business),
       message
     );
 
     res.json({ reply });
+
   } catch (err) {
     console.error("CHAT ERROR:", err);
     res.status(500).json({ error: "AI error" });

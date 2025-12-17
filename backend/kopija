@@ -161,8 +161,16 @@
 }
 </style>
 
-
 <script>
+// ===== SECURITY =====
+function escapeHTML(str) {
+  return str
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+// ===== MAIN SEND =====
 async function pSend(){
   const input = document.getElementById("pInput");
   const text = input.value.trim();
@@ -170,7 +178,10 @@ async function pSend(){
 
   const chat = document.getElementById("pChat");
 
-  // USER MSG
+  // Disable input (premium UX)
+  input.disabled = true;
+
+  // USER MESSAGE
   chat.innerHTML += `
     <div style="display:flex;justify-content:flex-end;">
       <div style="
@@ -180,13 +191,13 @@ async function pSend(){
         font-size:13px;
         max-width:75%;
         box-shadow:0 10px 26px rgba(139,92,246,.8);
-      ">${text}</div>
+      ">${escapeHTML(text)}</div>
     </div>
   `;
   input.value = "";
   chat.scrollTop = chat.scrollHeight;
 
-  // TYPING
+  // TYPING INDICATOR
   chat.innerHTML += `
     <div id="typing" style="display:flex;gap:8px;">
       <div style="font-size:18px;">🤖</div>
@@ -202,16 +213,27 @@ async function pSend(){
   chat.scrollTop = chat.scrollHeight;
 
   try {
+    // Timeout protection
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     const res = await fetch("https://aidra-ai.onrender.com/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify({
+      message: text,
+    clientId: window.AIDRA_CLIENT_ID || "demo"
+    })
+,
+      signal: controller.signal
     });
+
+    clearTimeout(timeout);
 
     if(!res.ok) throw new Error("API error");
 
     const data = await res.json();
-    document.getElementById("typing").remove();
+    document.getElementById("typing")?.remove();
 
     chat.innerHTML += `
       <div style="display:flex;gap:8px;">
@@ -223,7 +245,7 @@ async function pSend(){
           border-radius:16px;
           font-size:13px;
           max-width:80%;
-        ">${data.reply}</div>
+        ">${escapeHTML(data.reply)}</div>
       </div>
     `;
     chat.scrollTop = chat.scrollHeight;
@@ -231,6 +253,7 @@ async function pSend(){
   } catch (err) {
     console.error(err);
     document.getElementById("typing")?.remove();
+
     chat.innerHTML += `
       <div style="display:flex;gap:8px;">
         <div style="font-size:18px;">🤖</div>
@@ -245,12 +268,15 @@ async function pSend(){
         </div>
       </div>
     `;
+  } finally {
+    input.disabled = false;
+    input.focus();
   }
 }
 
+// ===== SUGGESTION CLICK =====
 function pUse(text){
   document.getElementById("pInput").value = text;
   pSend();
 }
 </script>
-

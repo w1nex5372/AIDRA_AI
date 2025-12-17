@@ -1,0 +1,12 @@
+{
+  "demo": {
+    "plan": "premium",
+    "prompt": "premium_aidra",
+    "business": "aidra"
+  },
+  "klinika_jonas": {
+    "plan": "basic",
+    "prompt": "basic_dentist",
+    "business": "dentist_jonas"
+  }
+}

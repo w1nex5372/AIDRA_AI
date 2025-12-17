@@ -7,5 +7,10 @@ const __dirname = path.dirname(__filename);
 
 export function loadPrompt(name) {
   const filePath = path.join(__dirname, "../prompts", `${name}.txt`);
+
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Prompt not found: ${name}`);
+  }
+
   return fs.readFileSync(filePath, "utf-8");
 }
