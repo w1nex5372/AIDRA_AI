@@ -2,20 +2,21 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import path from "path";
+import { fileURLToPath } from "url";
 import chatRoute from "./api/chat.js";
 
 const app = express();
 
-/**
- * 🔒 CORS – FRAMER + WIDGET SAFE
- * leidžiam iframe, widget.js, widget-ui.html
- */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// ✅ SERVE PUBLIC
+app.use(express.static(path.join(__dirname, "../public")));
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // leidžiam server-side, render healthcheck, curl, postman
       if (!origin) return callback(null, true);
-
       if (
         origin.includes("framer.ai") ||
         origin.includes("framer.com") ||
@@ -24,9 +25,7 @@ app.use(
       ) {
         return callback(null, true);
       }
-
-      console.warn("❌ CORS blocked:", origin);
-      return callback(null, false); // ❗ NE error, kad iframe nelūžtų
+      return callback(new Error("CORS not allowed"), false);
     },
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -34,16 +33,6 @@ app.use(
 );
 
 app.use(express.json());
-
-/**
- * 🔥 STATINIAI FAILAI (WIDGET)
- * TAVO atveju public yra backend/public
- */
-app.use(
-  express.static(
-    path.join(process.cwd(), "backend", "public")
-  )
-);
 
 app.get("/", (_, res) => {
   res.send("AIDRA AI backend is running 🚀");
