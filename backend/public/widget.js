@@ -7,7 +7,7 @@
   btn.id = "aidra-widget-btn";
   btn.innerHTML = `
     <span class="aidra-icon">🥐</span>
-    <span class="aidra-text">Talk to us</span>
+    <span class="aidra-text">Kalbekimes</span>
   `;
   document.body.appendChild(btn);
 
@@ -93,7 +93,7 @@
     open = next;
     iframe.style.display = open ? "block" : "none";
     // Optional: change label
-    btn.querySelector(".aidra-text").textContent = open ? "Close" : "Talk to us";
+    btn.querySelector(".aidra-text").textContent = open ? "Close" : "Kalbekimes";
   }
 
   btn.addEventListener("click", () => setOpen(!open));

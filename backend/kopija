@@ -162,6 +162,9 @@
 </style>
 
 <script>
+    const clientId = "demo";
+
+
 // ===== SECURITY =====
 function escapeHTML(str) {
   return str
@@ -221,8 +224,8 @@ async function pSend(){
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-      message: text,
-    clientId: window.AIDRA_CLIENT_ID || "demo"
+    message: text,
+    clientId: clientId
     })
 ,
       signal: controller.signal
