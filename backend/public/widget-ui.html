@@ -1,105 +1,92 @@
 <!DOCTYPE html>
 <html lang="lt">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AidraAI Widget</title>
-
-<style>
-body {
-  margin: 0;
-  background: transparent;
-  font-family: Inter, system-ui, sans-serif;
-}
-
-.aidra-widget {
-  width: 100%;
-  max-width: 520px;
-  height: 100vh;
-  margin: 0 auto;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-.card {
-  height: 100%;
-  border-radius: 28px;
-  padding: 18px;
-  background: radial-gradient(circle at top left, rgba(139,92,246,.45), rgba(8,8,16,.96));
-  box-shadow: 0 30px 80px rgba(139,92,246,.55);
-  display: flex;
-  flex-direction: column;
-  color: white;
-}
-
-#chat {
-  flex: 1;
-  overflow-y: auto;
-  margin-top: 12px;
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 999px;
-  border: none;
-  outline: none;
-}
-
-button {
-  margin-top: 8px;
-  padding: 12px;
-  border-radius: 999px;
-  border: none;
-  background: linear-gradient(135deg,#8b5cf6,#6d28d9);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AidraAI Widget</title>
+  <link rel="stylesheet" href="/widget-ui.css">
 </head>
-
 <body>
-<div class="aidra-widget">
-  <div class="card">
-    <b>AI sprendimų asistentas</b>
-    <small>GPT-5.2</small>
-
-    <div id="chat">
-      <p>👋 Sveiki! Nuo ko pradedam?</p>
+  <div class="panel">
+    <div class="topbar">
+      <div class="title">Chat with AidraAI</div>
+      <button class="icon-btn" id="closeBtn" aria-label="Close">✕</button>
     </div>
 
-    <input id="msg" placeholder="Įrašykite savo tikslą…" />
-    <button onclick="send()">Siųsti</button>
+    <div class="content">
+      <div class="hero">
+        <div class="logo">🥐</div>
+        <h2>Sveiki 👋</h2>
+        <p>Kuom galime padėti?</p>
+      </div>
+
+      <div class="chat" id="chat">
+        <div class="msg ai">Sveiki 👋 Parašykite trumpai, ko jums reikia (kaina, registracija, konsultacija ir t.t.).</div>
+      </div>
+
+      <div class="footer">
+        <div class="row">
+          <input class="input" id="msg" placeholder="Įrašykite klausimą..." />
+          <button class="send" id="sendBtn">Siųsti</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
-<script>
-const params = new URLSearchParams(window.location.search);
-const clientId = params.get("clientId") || "demo";
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const clientId = params.get("clientId") || "demo";
 
-async function send() {
-  const input = document.getElementById("msg");
-  const chat = document.getElementById("chat");
-  const text = input.value.trim();
-  if (!text) return;
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("msg");
+    const sendBtn = document.getElementById("sendBtn");
+    const closeBtn = document.getElementById("closeBtn");
 
-  chat.innerHTML += `<p><b>Jūs:</b> ${text}</p>`;
-  input.value = "";
+    closeBtn.addEventListener("click", () => {
+      window.parent.postMessage("aidra-close", "*");
+    });
 
-  const res = await fetch("https://aidra-ai.onrender.com/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message: text,
-      clientId
-    })
-  });
+    async function send(){
+      const text = input.value.trim();
+      if(!text) return;
 
-  const data = await res.json();
-  chat.innerHTML += `<p><b>AI:</b> ${data.reply}</p>`;
-  chat.scrollTop = chat.scrollHeight;
-}
-</script>
+      chat.insertAdjacentHTML("beforeend", `<div class="msg user">${escapeHtml(text)}</div>`);
+      input.value = "";
+      chat.scrollTop = chat.scrollHeight;
+
+      sendBtn.disabled = true;
+
+      try{
+        const res = await fetch("https://aidra-ai.onrender.com/api/chat", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ message: text, clientId })
+        });
+
+        const data = await res.json();
+        const reply = data?.reply || "Įvyko klaida. Bandykite dar kartą.";
+
+        chat.insertAdjacentHTML("beforeend", `<div class="msg ai">${escapeHtml(reply)}</div>`);
+        chat.scrollTop = chat.scrollHeight;
+      }catch(e){
+        chat.insertAdjacentHTML("beforeend", `<div class="msg ai">Įvyko klaida. Bandykite dar kartą.</div>`);
+      }finally{
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    function escapeHtml(str){
+      return str
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+
+    sendBtn.addEventListener("click", send);
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") send();
+    });
+  </script>
 </body>
 </html>
